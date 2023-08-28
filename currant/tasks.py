@@ -14,7 +14,7 @@ import rpy2.robjects as ro
 from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
 
-from currant.utility import replace_special_with_dot
+from currant.utility import replace_special_with_dot, read_fasta, reg_positon_residue
 
 
 @job('default')
@@ -576,7 +576,10 @@ def r_qfeatures_normalization(operation_id: int, session_id: str):
 
 
 def load_dataframe(channel_layer, input_file_id, message_template, request_form, session_id):
-    file = File.objects.get(id=input_file_id)
+    if type(input_file_id) == int:
+        file = File.objects.get(id=input_file_id)
+    else:
+        file = input_file_id
     extension = file.file.name.split(".")[-1]
     async_to_sync(channel_layer.group_send)(session_id, {
         'type': 'job_message',
@@ -724,4 +727,76 @@ def r_correlation_matrix(operation_id: int, session_id: str):
         })
 
 @job('default')
-def convert_msfragger_to_curtainptm
+def convert_msfragger_to_curtainptm(operation_id: int, session_id: str):
+    o = Operation.objects.get(id=operation_id)
+    message_template = {
+        'message': "Running operation",
+        'senderName': "Server",
+        'requestType': "Correlation Matrix (R)",
+        'operationId': o.id
+    }
+    channel_layer = get_channel_layer()
+    request_form = loads(o.value)
+    input_file_id = 0
+    fasta_file_id = 0
+    for i in o.input_files.all():
+        if i.file_type == "msfragger;table":
+            input_file_id = i.id
+        elif i.file_type == "fasta;txt":
+            fasta_file_id = i.id
+
+    try:
+        df = load_dataframe(channel_layer, input_file_id, message_template, request_form, session_id)
+        message_template["message"] = "Parse fasta into dictionary"
+        async_to_sync(channel_layer.group_send)(session_id, {
+            'type': 'job_message',
+            'message': message_template
+        })
+        fasta_file = File.objects.get(id=fasta_file_id).file.read().decode("utf-8")
+        fasta_dict = read_fasta(fasta_file)
+        message_template["message"] = "Processing dataframe"
+        async_to_sync(channel_layer.group_send)(session_id, {
+            'type': 'job_message',
+            'message': message_template
+        })
+        for i, row in df.iterrows():
+            match = reg_positon_residue.search(row[request_form["indexColumn"]])
+            if match:
+                position = int(match.group(2))
+                residue = match.group(1)
+                position_in_peptide = position
+                if row["ProteinID"] in fasta_dict:
+                    peptide_seq = row["Peptide"].split(";")[0].upper()
+                    try:
+                        peptide_position = fasta_dict[row["ProteinID"]].index(peptide_seq)
+                    except ValueError:
+                        peptide_position = fasta_dict[row["ProteinID"]].replace("I", "L").index(
+                            peptide_seq.replace("I", "L"))
+                        df.at[i, "Comment"] = "I replaced by L"
+                    if peptide_position >= -1:
+                        position_in_peptide = position - peptide_position
+                df.at[i, "Position"] = position
+                df.at[i, "Residue"] = residue
+                df.at[i, "Position.in.peptide"] = position_in_peptide
+
+        str_data = df.to_csv(sep="\t", index=False)
+        f = File(columns=dumps(df.columns.tolist()), file_type="msfragger;curtain;table")
+        f.file.save(f"{str(f.link_id)}.txt", ContentFile(str_data.encode("utf-8")))
+        f.save()
+        o.output_files.set([f])
+        o.job_finished = True
+        o.save()
+        message_template["message"] = "Completed operation"
+        async_to_sync(channel_layer.group_send)(session_id, {
+            'type': 'job_message',
+            'message': message_template
+        })
+    except Exception as error:
+        o.job_error = str(error)
+        o.job_error_status = True
+        o.save()
+        message_template["message"] = "Error: " + str(error)
+        async_to_sync(channel_layer.group_send)(session_id, {
+            'type': 'job_message',
+            'message': message_template
+        })
