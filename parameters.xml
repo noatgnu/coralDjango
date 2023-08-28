@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Parameters>
+  <ParameterGroup Name="Specific" CollapsedDefault="false">
+    <SingleChoiceWithSubParams Type="BaseLibS.Param.SingleChoiceWithSubParams, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Condition grouping">
+      <Value>0</Value>
+      <Values>
+        <Item>Group by condition column</Item>
+        <Item>Skip</Item>
+      </Values>
+      <SubParams>
+        <Parameters>
+          <ParameterGroup Name="" CollapsedDefault="false">
+            <SingleChoiceParam Type="BaseLibS.Param.SingleChoiceParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Condition column, eg R.FileName">
+              <Value>0</Value>
+              <Values>
+                <Item>R.FileName</Item>
+                <Item>R.Condition</Item>
+                <Item>R.Replicate</Item>
+                <Item>PG.Genes</Item>
+                <Item>PG.Organisms</Item>
+                <Item>PG.ProteinDescriptions</Item>
+                <Item>PG.ProteinGroups</Item>
+                <Item>PG.ProteinNames</Item>
+                <Item>PEP.PeptidePosition</Item>
+                <Item>EG.IsDecoy</Item>
+                <Item>EG.PrecursorId</Item>
+                <Item>EG.PTMAssayCandidateScore</Item>
+                <Item>EG.PTMAssayProbability</Item>
+                <Item>EG.PTMLocalizationConfidence</Item>
+                <Item>EG.PTMLocalizationProbabilities</Item>
+                <Item>EG.NormalizationFactor</Item>
+              </Values>
+            </SingleChoiceParam>
+          </ParameterGroup>
+        </Parameters>
+        <Parameters />
+      </SubParams>
+    </SingleChoiceWithSubParams>
+    <SingleChoiceWithSubParams Type="BaseLibS.Param.SingleChoiceWithSubParams, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Collapse level">
+      <Value>0</Value>
+      <Values>
+        <Item>Target PTM site-level, e.g. ABC1_S15_M1</Item>
+        <Item>Target PTM peptide-level, e.g. FS[ph]EAMST[ph]R (stoichiometry possible)</Item>
+        <Item>ModSpec peptide-level, e.g. FSEAMSTR_2[ph];1[ox]</Item>
+      </Values>
+      <SubParams>
+        <Parameters>
+          <ParameterGroup Name="" CollapsedDefault="false">
+            <SingleChoiceWithSubParams Type="BaseLibS.Param.SingleChoiceWithSubParams, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Probability column type">
+              <Value>0</Value>
+              <Values>
+                <Item>EG.PTMLocalizationProbabilities (SN)</Item>
+                <Item>EG.PTMAssayProbability (SN)</Item>
+                <Item>No probability column</Item>
+              </Values>
+              <SubParams>
+                <Parameters>
+                  <ParameterGroup Name="" CollapsedDefault="false">
+                    <DoubleParam Type="BaseLibS.Param.DoubleParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Localization cutoff">
+                      <Value>0.75</Value>
+                    </DoubleParam>
+                  </ParameterGroup>
+                </Parameters>
+                <Parameters>
+                  <ParameterGroup Name="" CollapsedDefault="false">
+                    <DoubleParam Type="BaseLibS.Param.DoubleParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Localization cutoff">
+                      <Value>0.75</Value>
+                    </DoubleParam>
+                  </ParameterGroup>
+                </Parameters>
+                <Parameters>
+                  <ParameterGroup Name="" CollapsedDefault="false">
+                    <SingleChoiceParam Type="BaseLibS.Param.SingleChoiceParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="PTM position column type">
+                      <Value>0</Value>
+                      <Values>
+                        <Item>EG.PTMLocalizationProbabilities (SN)</Item>
+                        <Item>EG.PrecursorId (SN)</Item>
+                      </Values>
+                    </SingleChoiceParam>
+                  </ParameterGroup>
+                </Parameters>
+              </SubParams>
+            </SingleChoiceWithSubParams>
+            <SingleChoiceParam Type="BaseLibS.Param.SingleChoiceParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Genes or protein groups">
+              <Value>1</Value>
+              <Values>
+                <Item>PG.Genes</Item>
+                <Item>PG.ProteinGroups</Item>
+              </Values>
+            </SingleChoiceParam>
+            <FileParam Type="BaseLibS.Param.FileParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="FASTA file (optional)">
+              <Value />
+            </FileParam>
+            <StringParam Type="BaseLibS.Param.StringParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="FASTA identifier rule">
+              <Value>.*GN=([^ ]*) .*</Value>
+            </StringParam>
+          </ParameterGroup>
+        </Parameters>
+        <Parameters>
+          <ParameterGroup Name="" CollapsedDefault="false">
+            <SingleChoiceWithSubParams Type="BaseLibS.Param.SingleChoiceWithSubParams, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Probability column type">
+              <Value>0</Value>
+              <Values>
+                <Item>EG.PTMLocalizationProbabilities (SN)</Item>
+                <Item>EG.PTMAssayProbability (SN)</Item>
+                <Item>No probability column</Item>
+                <Item>Modified sequence (MQ)</Item>
+              </Values>
+              <SubParams>
+                <Parameters>
+                  <ParameterGroup Name="" CollapsedDefault="false">
+                    <DoubleParam Type="BaseLibS.Param.DoubleParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Localization cutoff">
+                      <Value>0.75</Value>
+                    </DoubleParam>
+                  </ParameterGroup>
+                </Parameters>
+                <Parameters>
+                  <ParameterGroup Name="" CollapsedDefault="false">
+                    <DoubleParam Type="BaseLibS.Param.DoubleParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Localization cutoff">
+                      <Value>0.75</Value>
+                    </DoubleParam>
+                  </ParameterGroup>
+                </Parameters>
+                <Parameters>
+                  <ParameterGroup Name="" CollapsedDefault="false">
+                    <SingleChoiceParam Type="BaseLibS.Param.SingleChoiceParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="PTM position column type">
+                      <Value>0</Value>
+                      <Values>
+                        <Item>EG.PTMLocalizationProbabilities (SN)</Item>
+                        <Item>EG.PrecursorId (SN)</Item>
+                        <Item>Modified sequence (MQ)</Item>
+                      </Values>
+                    </SingleChoiceParam>
+                  </ParameterGroup>
+                </Parameters>
+                <Parameters>
+                  <ParameterGroup Name="" CollapsedDefault="false">
+                    <DoubleParam Type="BaseLibS.Param.DoubleParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Localization cutoff">
+                      <Value>0.75</Value>
+                    </DoubleParam>
+                    <SingleChoiceParam Type="BaseLibS.Param.SingleChoiceParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Target PTM Probabilities column">
+                      <Value>0</Value>
+                      <Values>
+                        <Item>R.FileName</Item>
+                        <Item>R.Condition</Item>
+                        <Item>R.Replicate</Item>
+                        <Item>PG.Genes</Item>
+                        <Item>PG.Organisms</Item>
+                        <Item>PG.ProteinDescriptions</Item>
+                        <Item>PG.ProteinGroups</Item>
+                        <Item>PG.ProteinNames</Item>
+                        <Item>PEP.PeptidePosition</Item>
+                        <Item>EG.IsDecoy</Item>
+                        <Item>EG.PrecursorId</Item>
+                        <Item>EG.PTMAssayCandidateScore</Item>
+                        <Item>EG.PTMAssayProbability</Item>
+                        <Item>EG.PTMLocalizationConfidence</Item>
+                        <Item>EG.PTMLocalizationProbabilities</Item>
+                        <Item>EG.NormalizationFactor</Item>
+                      </Values>
+                    </SingleChoiceParam>
+                  </ParameterGroup>
+                </Parameters>
+              </SubParams>
+            </SingleChoiceWithSubParams>
+            <SingleChoiceParam Type="BaseLibS.Param.SingleChoiceParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Stoichiometry calculation">
+              <Value>0</Value>
+              <Values>
+                <Item>Calculate stoichiometries</Item>
+                <Item>Skip</Item>
+              </Values>
+            </SingleChoiceParam>
+          </ParameterGroup>
+        </Parameters>
+        <Parameters>
+          <ParameterGroup Name="" CollapsedDefault="false">
+            <SingleChoiceWithSubParams Type="BaseLibS.Param.SingleChoiceWithSubParams, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Probability column type">
+              <Value>0</Value>
+              <Values>
+                <Item>EG.PTMLocalizationProbabilities (SN)</Item>
+                <Item>EG.PTMAssayProbability (SN)</Item>
+                <Item>No probability column</Item>
+              </Values>
+              <SubParams>
+                <Parameters>
+                  <ParameterGroup Name="" CollapsedDefault="false">
+                    <DoubleParam Type="BaseLibS.Param.DoubleParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Localization cutoff">
+                      <Value>0.75</Value>
+                    </DoubleParam>
+                  </ParameterGroup>
+                </Parameters>
+                <Parameters>
+                  <ParameterGroup Name="" CollapsedDefault="false">
+                    <DoubleParam Type="BaseLibS.Param.DoubleParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Localization cutoff">
+                      <Value>0.75</Value>
+                    </DoubleParam>
+                  </ParameterGroup>
+                </Parameters>
+                <Parameters>
+                  <ParameterGroup Name="" CollapsedDefault="false">
+                    <SingleChoiceParam Type="BaseLibS.Param.SingleChoiceParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="PTM position column type">
+                      <Value>0</Value>
+                      <Values>
+                        <Item>EG.PTMLocalizationProbabilities (SN)</Item>
+                        <Item>EG.PrecursorId (SN)</Item>
+                      </Values>
+                    </SingleChoiceParam>
+                  </ParameterGroup>
+                </Parameters>
+              </SubParams>
+            </SingleChoiceWithSubParams>
+          </ParameterGroup>
+        </Parameters>
+      </SubParams>
+    </SingleChoiceWithSubParams>
+    <StringParam Type="BaseLibS.Param.StringParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Variable PTMs, target PTM first">
+      <Value>[Phospho (STY)];[Deamidation (NQ)];[Oxidation (M)];[Carbamidomethyl (C)]</Value>
+    </StringParam>
+    <SingleChoiceParam Type="BaseLibS.Param.SingleChoiceParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Aggregation type">
+      <Value>0</Value>
+      <Values>
+        <Item>Linear modeling based</Item>
+        <Item>Summing</Item>
+      </Values>
+    </SingleChoiceParam>
+    <IntParam Type="BaseLibS.Param.IntParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="CPUcores">
+      <Value>8</Value>
+    </IntParam>
+  </ParameterGroup>
+  <ParameterGroup Name="Generic" CollapsedDefault="false">
+    <FileParam Type="BaseLibS.Param.FileParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Executable">
+      <Value>C:\Program Files\R\R-4.3.1\bin\Rscript.exe</Value>
+    </FileParam>
+    <LabelParam Type="BaseLibS.Param.LabelParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Download data for preview">
+      <Value />
+    </LabelParam>
+    <LabelParam Type="BaseLibS.Param.LabelParam, BaseLibS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Name="Download parameter for preview">
+      <Value />
+    </LabelParam>
+  </ParameterGroup>
+</Parameters>

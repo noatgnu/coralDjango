@@ -1,0 +1,103 @@
+version: "3.8"
+services:
+  main-backend:
+    container_name: main-backend
+    build:
+      dockerfile: Dockerfile
+    command: gunicorn currantDjango.asgi:application -k uvicorn.workers.UvicornWorker --log-level=debug --timeout 300 --bind 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis-currant
+      - postgres-currant
+    networks:
+      - currant-net
+    environment:
+      - POSTGRES_NAME=currant
+      - POSTGRES_DB=currant
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=testpostgrest
+      - POSTGRES_HOST=postgres-currant
+      - REDIS_HOST=redis-currant
+      - REDIS_PASSWORD=testrediscurrant
+      - REDIS_PORT=6379
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME}
+      - AWS_S3_ENDPOINT_URL=${AWS_S3_ENDPOINT_URL}
+  worker-1:
+    container_name: worker-1
+    build:
+      dockerfile: Dockerfile
+    command: python manage.py rqworker default
+    depends_on:
+      - redis-currant
+      - postgres-currant
+    networks:
+      - currant-net
+    environment:
+      - POSTGRES_NAME=currant
+      - POSTGRES_DB=currant
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=testpostgrest
+      - POSTGRES_HOST=postgres-currant
+      - REDIS_HOST=redis-currant
+      - REDIS_PASSWORD=testrediscurrant
+      - REDIS_PORT=6379
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME}
+      - AWS_S3_ENDPOINT_URL=${AWS_S3_ENDPOINT_URL}
+  worker-2:
+    container_name: worker-2
+    build:
+      dockerfile: Dockerfile
+    command: python manage.py rqworker default
+    depends_on:
+      - redis-currant
+      - postgres-currant
+    networks:
+      - currant-net
+    environment:
+      - POSTGRES_NAME=currant
+      - POSTGRES_DB=currant
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=testpostgrest
+      - POSTGRES_HOST=postgres-currant
+      - REDIS_HOST=redis-currant
+      - REDIS_PASSWORD=testrediscurrant
+      - REDIS_PORT=6379
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME}
+      - AWS_S3_ENDPOINT_URL=${AWS_S3_ENDPOINT_URL}
+  redis-currant:
+    image: bitnami/redis:latest
+    container_name: redis-currant
+    environment:
+      - REDIS_PASSWORD=testrediscurrant
+    ports:
+      - "6379:6379"
+    networks:
+      - currant-net
+  postgres-currant:
+    image: postgres:14
+    container_name: postgres-currant
+    environment:
+      - POSTGRES_DB=currant
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=testpostgrest
+    ports:
+      - "5432:5432"
+    networks:
+      - currant-net
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - currant-net
+networks:
+    currant-net:
+
