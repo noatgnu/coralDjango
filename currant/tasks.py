@@ -148,7 +148,6 @@ def r_qfeatures_protein(operation_id: int, session_id: str):
             currentAssayName <- "imputedAssay"
             """)
             d = ro.r("data")
-            print(d)
 
         if request_form["log2"]:
             message_template["message"] = "Perform log2 transformation"
@@ -220,11 +219,7 @@ def r_qfeatures_protein(operation_id: int, session_id: str):
         result = ro.r("result")
         with (ro.default_converter + pandas2ri.converter).context():
             pd_from_r_df = ro.conversion.get_conversion().rpy2py(result)
-
-        str_data = pd_from_r_df.to_csv(sep="\t", index=False)
-        f = File(columns=dumps(pd_from_r_df.columns.tolist()), file_type="differential_analysis;table")
-        f.file.save(f"{str(f.link_id)}.txt", ContentFile(str_data.encode("utf-8")))
-        f.save()
+        f = save_df(pd_from_r_df, "differential_analysis;table")
         o.output_files.set([f])
         o.job_finished = True
         o.save()
@@ -301,10 +296,7 @@ def alphapeptstats_diff(operation_id: int, session_id: str):
             'message': message_template
         })
         result = result.merge(df, on=form["indexColumn"], how="left")
-        str_data = result.to_csv(sep="\t", index=False)
-        f = File(columns=dumps(result.columns.tolist()), file_type="differential_analysis;table")
-        f.file.save(f"{str(f.link_id)}.txt", ContentFile(str_data.encode("utf-8")))
-        f.save()
+        f = save_df(result, "differential_analysis;table")
         o.output_files.set([f])
         message_template["message"] = "Completed operation"
         async_to_sync(channel_layer.group_send)(session_id, {
@@ -400,11 +392,7 @@ def r_qfeatures_imputation(operation_id: int, session_id: str):
         result = ro.r("result")
         with (ro.default_converter + pandas2ri.converter).context():
             pd_from_r_df = ro.conversion.get_conversion().rpy2py(result)
-        print(pd_from_r_df)
-        str_data = pd_from_r_df.to_csv(sep="\t", index=False)
-        f = File(columns=dumps(pd_from_r_df.columns.tolist()), file_type="imputation;table")
-        f.file.save(f"{str(f.link_id)}.txt", ContentFile(str_data.encode("utf-8")))
-        f.save()
+        f = save_df(pd_from_r_df, "imputation;table")
         o.output_files.set([f])
         o.job_finished = True
         o.save()
@@ -543,13 +531,7 @@ def r_qfeatures_normalization(operation_id: int, session_id: str):
             tick_text.append(c)
             graph_box_before_normalization.append(plotly_graph_data_before_normalization[c])
             graph_box_after_normalization.append(plotly_graph_data_after_normalization[c])
-
-
-        str_data = pd_from_r_df.to_csv(sep="\t", index=False)
-        f = File(columns=dumps(pd_from_r_df.columns.tolist()), file_type="normalization;table")
-        f.file.save(f"{str(f.link_id)}.txt", ContentFile(str_data.encode("utf-8")))
-        f.save()
-
+        f = save_df(pd_from_r_df, "normalization;table")
         graphData = File(columns=[], file_type="plotly;profile_plot;boxplot;json")
         graphData.file.save(f"{str(graphData.link_id)}.json", ContentFile(dumps({
             'tick_val': tick_val, 'tick_text': tick_text, 'graph_box_before_normalization': graph_box_before_normalization,
@@ -693,11 +675,7 @@ def r_correlation_matrix(operation_id: int, session_id: str):
         with (ro.default_converter + pandas2ri.converter).context():
             pd_from_r_df = ro.conversion.get_conversion().rpy2py(result)
 
-        str_data = pd_from_r_df.to_csv(sep="\t", index=False)
-        corr_f = File(columns=dumps(pd_from_r_df.columns.tolist()), file_type="correlation_matrix;table")
-        corr_f.file.save(f"{str(corr_f.link_id)}.txt", ContentFile(str_data.encode("utf-8")))
-        corr_f.save()
-
+        corr_f = save_df(pd_from_r_df, "correlation_matrix;table")
         f = File(columns=[], file_type="correlation_matrix;plot;pdf")
         with open(f"{o.input_files.all()[0].id}_col_corr.pdf", "rb") as pdf_file:
             f.file.save(f"{str(f.link_id)}.pdf", ContentFile(pdf_file.read()))
@@ -779,10 +757,8 @@ def convert_msfragger_to_curtainptm(operation_id: int, session_id: str):
                 df.at[i, "Residue"] = residue
                 df.at[i, "Position.in.peptide"] = position_in_peptide
 
-        str_data = df.to_csv(sep="\t", index=False)
-        f = File(columns=dumps(df.columns.tolist()), file_type="msfragger;curtain;table")
-        f.file.save(f"{str(f.link_id)}.txt", ContentFile(str_data.encode("utf-8")))
-        f.save()
+        file_type = "msfragger;curtain;table"
+        f = save_df(df, file_type)
         o.output_files.set([f])
         o.job_finished = True
         o.save()
@@ -800,3 +776,11 @@ def convert_msfragger_to_curtainptm(operation_id: int, session_id: str):
             'type': 'job_message',
             'message': message_template
         })
+
+
+def save_df(df, file_type):
+    str_data = df.to_csv(sep="\t", index=False)
+    f = File(columns=dumps(df.columns.tolist()), file_type=file_type)
+    f.file.save(f"{str(f.link_id)}.txt", ContentFile(str_data.encode("utf-8")))
+    f.save()
+    return f
